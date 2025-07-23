@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: facebook-mini
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    nodeVersion: 22.17.0

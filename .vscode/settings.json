@@ -1,0 +1,18 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.printWidth": 250,
+  "sqltools.connections": [
+    {
+      "pgOptions": {
+        "ssl": {
+          "rejectUnauthorized": true
+        }
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "driver": "PostgreSQL",
+      "name": "facebook_mini_server",
+      "connectString": "postgresql://facebook_mini:JB8hqPZYUTyliN7UnevrRNqEQhrrGiXB@dpg-d2035eq4d50c73b8p00g-a.oregon-postgres.render.com/facebook_mini"
+    }
+  ]
+}
