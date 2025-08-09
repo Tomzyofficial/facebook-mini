@@ -1,3 +1,4 @@
+"use client";
 import SettingsSharp from "@mui/icons-material/SettingsSharp";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMore";
@@ -12,8 +13,10 @@ import DirectionsBoatFilledRoundedIcon from "@mui/icons-material/DirectionsBoatF
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { signout } from "@/app/api/auth/signout/route";
 import { ShowProfileImg } from "@/components/ShowProfileImg";
+import { useEffect, useState } from "react";
 
-export function MenuTab({ gender, fname, lname }) {
+export function MenuTab() {
+  const [loggedInUser, setLoggedInUser] = useState({});
   const menuTabs = [
     { icon: <GroupsSharpIcon sx={{ color: "white", backgroundColor: "#3776ff", padding: "3px", borderRadius: "50%" }} />, label: "Groups", id: 1 },
     { icon: <AccessTimeOutlinedIcon sx={{ color: "#3776ff" }} />, label: "Memories", id: 2 },
@@ -24,6 +27,29 @@ export function MenuTab({ gender, fname, lname }) {
     { icon: <DirectionsBoatFilledRoundedIcon sx={{ color: "#3776ff" }} />, label: "Feeds", id: 7 },
     { icon: <FavoriteRoundedIcon sx={{ color: "rgb(255, 69, 0)", fontSize: "25px" }} />, label: "Dating", id: 8 },
   ];
+  // Fetch Logged in user from the database and return the data
+  useEffect(() => {
+    async function fetchLoggedInUser() {
+      try {
+        const res = await fetch("/api/fetchLoggedInUser", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+        if (data.user) {
+          setLoggedInUser(data.user);
+          console.log("Logged in user:", data.user);
+        }
+      } catch (err) {
+        setLoggedInUser({});
+        console.error("Failed to fetch logged in user:", err);
+      }
+    }
+    fetchLoggedInUser();
+  }, []);
 
   return (
     <div className="top-0 left-0 fixed overflow-y-auto pb-4 h-[87vh] w-full bg-[var(--background)] text-[var(--foreground)]">
@@ -44,9 +70,9 @@ export function MenuTab({ gender, fname, lname }) {
           <div className="p-4 flex justify-between items-center">
             <figure className="flex items-center gap-3">
               {/* Show profile image if there's one, else show the fallback avatar icon */}
-              <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt={`${gender.gender} Avatar`} width={30} height={30} className="rounded-full h-[33px] w-[33px]" />
+              <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt="User Profile Avatar" width={30} height={30} className="rounded-full h-[33px] w-[33px]" />
               <figcaption>
-                {fname.fname.charAt(0).toUpperCase() + fname.fname.slice(1)} {lname.lname.charAt(0).toUpperCase() + lname.lname.slice(1)}
+                {loggedInUser.fname ? loggedInUser.fname.charAt(0).toUpperCase() + loggedInUser.fname.slice(1) : ""} {loggedInUser.lname ? loggedInUser.lname.charAt(0).toUpperCase() + loggedInUser.lname.slice(1) : ""}
               </figcaption>
             </figure>
             <span className="bg-[#ddd] rounded-full">

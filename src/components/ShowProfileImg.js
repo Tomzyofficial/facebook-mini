@@ -24,7 +24,7 @@ export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, clas
         if (!imgRes.ok) {
           setImageSrc(null);
           setHasCustomImage(false);
-          throw new Error(`Failed to fetch profile image: ${imgRes.status}`);
+          // throw new Error(`Failed to fetch profile image: ${imgRes.status}`);
         }
 
         const imgData = await imgRes.json();
@@ -68,5 +68,5 @@ export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, clas
   }
 
   // Return a placeholder if no fallback is provided
-  return <div className={`${className} bg-gray-300`} style={{ width, height }} />;
+  // return <div className={`${className} bg-gray-300`} style={{ width, height }} />;
 }

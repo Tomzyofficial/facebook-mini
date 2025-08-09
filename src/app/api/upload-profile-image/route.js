@@ -25,7 +25,7 @@ export async function POST(req) {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      return new Response("Invalid file type. Only images are allowed.", { status: 400 });
+      return new Response("Invalid file type. Only images are allowed.", { status: 403 });
     }
 
     // Validate file size (5MB)

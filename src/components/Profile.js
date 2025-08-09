@@ -11,11 +11,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { verifySession } from "@/app/_lib/session";
 
-export function Profile({ gender, fname, lname, onImageUpdate }) {
+export function Profile({ onImageUpdate }) {
   const router = useRouter();
   const inputRef = useRef(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -47,9 +48,29 @@ export function Profile({ gender, fname, lname, onImageUpdate }) {
     }
 
     getProfileImage();
+
+    // Fetch logged in user and return the data
+    async function fetchLoggedInUser() {
+      try {
+        const res = await fetch("/api/fetchLoggedInUser", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+        if (data.user) {
+          setLoggedInUser(data.user);
+        }
+      } catch (err) {
+        console.error("Failed to fetch logged in user:", err);
+      }
+    }
+    fetchLoggedInUser();
   }, []);
 
-  // Upload handler
+  // Profile image upload handler
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
@@ -115,6 +136,7 @@ export function Profile({ gender, fname, lname, onImageUpdate }) {
     }
   };
 
+  // Handle avatar click
   const handleAvatarClick = () => {
     if (!isUploading) {
       inputRef.current?.click();
@@ -156,7 +178,7 @@ export function Profile({ gender, fname, lname, onImageUpdate }) {
 
       <section className="p-2">
         <div>
-          {fname.fname.charAt(0).toUpperCase() + fname.fname.slice(1)} {lname.lname.charAt(0).toUpperCase() + lname.lname.slice(1)}
+          {loggedInUser.fname ? loggedInUser.fname.charAt(0).toUpperCase() + loggedInUser.fname.slice(1) : ""} {loggedInUser.lname ? loggedInUser.lname.charAt(0).toUpperCase() + loggedInUser.lname.slice(1) : ""}
           <span>
             <ExpandMoreIcon />
           </span>

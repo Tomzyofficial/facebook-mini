@@ -15,7 +15,7 @@ import { MenuTab } from "@/components/MenuTab";
 // It also contains the functionality to handle the active tab
 // It also contains the functionality to handle the inactive tab
 
-export function Tab({ gender, fname, lname }) {
+export function Tab() {
   const [activeTab, setActiveTab] = useState("home");
 
   const tabs = [
@@ -49,7 +49,7 @@ export function Tab({ gender, fname, lname }) {
   function handleSwitchTab() {
     switch (activeTab) {
       case "menu":
-        return <MenuTab gender={gender} fname={fname} lname={lname} />;
+        return <MenuTab />;
     }
   }
 
