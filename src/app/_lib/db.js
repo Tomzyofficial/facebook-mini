@@ -1,13 +1,19 @@
 import { Pool } from "pg";
 
+const isLocal = process.env.NODE_ENV === "development";
+
+// Create the pool
 const pool = new Pool({
   connectionString: process.env.POSTGRE_DATABASE_URL,
-  ssl: process.env.NODE_ENV === "development" ? { rejectUnauthorized: false } : { rejectUnauthorized: true },
+  ssl:
+    process.env.POSTGRE_DATABASE_URL?.includes("localhost") || isLocal
+      ? false // no SSL for local dev
+      : { rejectUnauthorized: false }, // SSL for hosted DBs (Heroku, Railway, Supabase, Neon, etc.)
 });
 
 pool.on("error", (error) => {
   console.error("Unexpected error occurred: ", error);
-  process.exit(-1);
+  process.exit(1);
 });
 
 export default pool;
