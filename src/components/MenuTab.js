@@ -58,15 +58,15 @@ export function MenuTab() {
           <h1 className="text-lg font-bold">Menu</h1>
           <div className="flex justify-between gap-4">
             <span>
-              <SettingsSharp sx={{ fontSize: "25px", backgroundColor: "#ccc", borderRadius: "50%", padding: "5px" }} />
+              <SettingsSharp sx={{ fontSize: "25px", borderRadius: "50%", padding: "5px" }} className="bg-(--secondary-light) dark:bg-neutral-900" />
             </span>
             <span>
-              <SearchIcon sx={{ fontSize: "25px", backgroundColor: "#ccc", borderRadius: "50%", padding: "5px" }} />
+              <SearchIcon sx={{ fontSize: "25px", borderRadius: "50%", padding: "5px" }} className="bg-(--secondary-light) dark:bg-neutral-900" />
             </span>
           </div>
         </div>
 
-        <div className="bg-[var(--white-color)] my-4 shadow-sm rounded-lg divide-y divide-zinc-200">
+        <div className="bg-[var(--white-color)] dark:bg-neutral-900 my-4 shadow-sm rounded-lg divide-y divide-zinc-200">
           <div className="p-4 flex justify-between items-center">
             <figure className="flex items-center gap-3">
               {/* Show profile image if there's one, else show the fallback avatar icon */}
@@ -75,13 +75,13 @@ export function MenuTab() {
                 {loggedInUser.fname ? loggedInUser.fname.charAt(0).toUpperCase() + loggedInUser.fname.slice(1) : ""} {loggedInUser.lname ? loggedInUser.lname.charAt(0).toUpperCase() + loggedInUser.lname.slice(1) : ""}
               </figcaption>
             </figure>
-            <span className="bg-[#ddd] rounded-full">
+            <span className="bg-(--secondary-light) dark:bg-neutral-800 rounded-full">
               <ExpandMoreSharpIcon />
             </span>
           </div>
 
           <div className="flex items-center gap-3 px-4 py-2">
-            <AddSharpIcon sx={{ fontSize: "25px", backgroundColor: "gray", color: "white", borderRadius: "50%", padding: "5px" }} />
+            <AddSharpIcon className="bg-(--secondary-light) dark:bg-neutral-800" sx={{ fontSize: "25px", borderRadius: "50%", padding: "5px" }} />
             <span>
               <p>Create new profile or page</p>
               <small>Switch between profiles with one login.</small>
@@ -93,13 +93,13 @@ export function MenuTab() {
           <h2>Your shortcuts</h2>
           <div className="grid grid-cols-2 gap-4">
             {menuTabs.map((tab) => (
-              <div key={tab.id} className="bg-[var(--white-color)] shadow-sm rounded-lg flex flex-col p-2">
+              <div key={tab.id} className="bg-[var(--white-color)] dark:bg-neutral-900 shadow-sm rounded-lg flex flex-col p-2">
                 <span>{tab.icon}</span>
                 <span>{tab.label}</span>
               </div>
             ))}
           </div>
-          <button className="cursor-pointer my-4 w-full h-full bg-[#ddd] p-2 rounded-lg" type="submit" onClick={signout}>
+          <button className="cursor-pointer my-4 w-full h-full bg-(--secondary-light) dark:bg-neutral-900 p-2 rounded-lg" type="submit" onClick={signout}>
             Log out
           </button>
         </div>

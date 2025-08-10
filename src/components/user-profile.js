@@ -237,9 +237,9 @@ export function UserProfile() {
           </div>
 
           <div className="flex items-center gap-4">
-            <AddsharpIcon sx={{ fontSize: "35px", backgroundColor: "#ccc", borderRadius: "50%", padding: "8px" }} />
-            <SearchIcon onClick={() => setIsSearchOpen(true)} sx={{ fontSize: "35px", backgroundColor: "#ccc", borderRadius: "50%", padding: "8px" }} />
-            <div className="bg-[#ccc] rounded-full p-[8px]">
+            <AddsharpIcon sx={{ fontSize: "35px", borderRadius: "50%", padding: "8px" }} className="bg-(--secondary-light) dark:bg-neutral-800" />
+            <SearchIcon onClick={() => setIsSearchOpen(true)} sx={{ fontSize: "35px", borderRadius: "50%", padding: "8px" }} className="bg-(--secondary-light) dark:bg-neutral-800" />
+            <div className="bg-(--secondary-light) dark:bg-neutral-800 rounded-full p-[8px]">
               <Image src="/images/facebook-messenger.svg" alt="Facebook messenger" width={20} height={20} style={{ Width: "100%", maxHeight: "100%" }} />
             </div>
           </div>
@@ -252,7 +252,7 @@ export function UserProfile() {
             <div className="relative w-full">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2" sx={{ color: "GrayText" }} />
               <form onSubmit={handleSearchFilter} aria-busy={isLoading}>
-                <input type="text" name="inputText" placeholder="Search with Meta AI" className="bg-(--secondary-light) dark:bg-neutral-600 p-2 pl-10 rounded-lg outline-none border-none w-full" />
+                <input type="text" name="inputText" placeholder="Search with Meta AI" className="bg-(--secondary-light) dark:bg-neutral-900 p-2 pl-10 rounded-lg outline-none border-none w-full" />
                 <button type="submit" className="hidden"></button>
               </form>
             </div>
@@ -326,7 +326,7 @@ export function UserProfile() {
       {/* This section displays the loggedIn user's profile picture and names. It also displays other users profile pictures and names from the database */}
       <section className={`p-2 overflow-x-auto ${styles.scrollbar_hide}`}>
         <div className="flex gap-2 min-w-max">
-          <div className="relative bg-[var(--foreground)] text-white rounded-md flex-shrink-0 h-38">
+          <div className="relative bg-[var(--foreground)] dark:bg-neutral-900 text-white rounded-md flex-shrink-0 h-38">
             <figure>
               {/* If user had already selected a profile image before, load the image from the database else use gender prop to determine whether user is a male or female -- show avatar icon respectfully */}
               <ShowProfileImg
@@ -368,7 +368,7 @@ export function UserProfile() {
       <section className="mb-30">
         <div>
           {retrievedPosts.map((item) => (
-            <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-zinc-900 dark:border-neutral-900 border-t border-slate-100">
+            <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <Image src="/images/avatar_man.jpg" width={30} height={30} className="rounded-full" alt="Profile avatar" />
                 <small>{new Date(item.created_at).getMinutes()}m</small>

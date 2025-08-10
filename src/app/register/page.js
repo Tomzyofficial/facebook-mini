@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 
 export default function StepByStepSignup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState({ error: "", message: "" });
+  const [error, setError] = useState({ error: false, message: [], e: "" });
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     fname: "",
@@ -40,8 +40,12 @@ export default function StepByStepSignup() {
     if (result.success) {
       redirect("/facebook");
     } else {
-      setError({ error: true, message: result.message });
       setIsSubmitting(false);
+      setError({
+        error: true,
+        message: Array.isArray(result.error) ? result.error : [result.error || "Registration failed"],
+        e: result.e,
+      });
     }
   };
 
@@ -129,7 +133,7 @@ export default function StepByStepSignup() {
               <p className="text-sm text-gray-500">Choose your date of birth. You can always make this private later.</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col gap-2">
               <TextField
                 min="2007-01-01"
                 max="2025-01-01"
@@ -148,9 +152,28 @@ export default function StepByStepSignup() {
                   },
                 }}
               />
+              {error.error && error.e === "dob" && <p>{error.message}</p>}
 
               {/* Next button. This button makes sure date of birth input field is filled before accessing the next step */}
-              <button onClick={() => formData.dob && setStep(3)} className="cursor-pointer bg-[var(--secondary)] hover:bg-[var(--secondary-dim)] transition-all duration-300 text-white px-4 py-2 rounded-[50px] col-span-2">
+              <button
+                onClick={() => {
+                  if (!formData.dob) return;
+                  const year = parseInt(String(formData.dob).slice(0, 4), 10);
+                  // Check if the year part of the dob (from input type="date", e.g. "YYYY-MM-DD") is greater than 2025
+                  if (year > 2025) {
+                    setError({ error: true, message: "Year cannot be after 2025", e: "dob" });
+                    return;
+                  }
+                  // Check if the year part of the dob (from input type="date", e.g. "YYYY-MM-DD") is less than 2007
+                  if (year < 2007) {
+                    setError({ error: true, message: "You must be at least 18 years old", e: "dob" });
+                    return;
+                  }
+                  setError({ error: false, message: "", e: "" });
+                  setStep(3);
+                }}
+                className="cursor-pointer bg-[var(--secondary)] hover:bg-[var(--secondary-dim)] transition-all duration-300 text-white px-4 py-2 rounded-[50px] col-span-2"
+              >
                 Next
               </button>
             </div>
@@ -191,7 +214,7 @@ export default function StepByStepSignup() {
               <p className="text-sm text-gray-500">Enter your email address. You can always make this private later.</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col gap-4">
               <TextField
                 type="email"
                 name="email"
@@ -208,6 +231,7 @@ export default function StepByStepSignup() {
                   },
                 }}
               />
+              {error.error && error.e === "email" && <p>{error.message}</p>}
 
               {/* Next button. This button makes sure the gender input field is filled before accessing the next step */}
               <button onClick={() => formData.email.includes("@") && setStep(5)} className="cursor-pointer bg-[var(--secondary)] hover:bg-[var(--secondary-dim)] transition-all duration-300 text-white px-4 py-2 rounded-[50px] col-span-2">
@@ -225,7 +249,7 @@ export default function StepByStepSignup() {
               <p className="text-sm text-gray-500">Choose a strong password.</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col gap-2">
               <div className="relative grid">
                 <TextField
                   required
@@ -255,7 +279,7 @@ export default function StepByStepSignup() {
               </div>
 
               {/* Show error message if there's any caught on the api route */}
-              {error.error && <p className="text-red-500">{error.message}</p>}
+              {error.error && error.e === "password" && <p>{error.message}</p>}
 
               {/* Finish button */}
               <button

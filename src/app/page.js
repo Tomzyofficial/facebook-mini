@@ -76,7 +76,7 @@ export default function Home() {
                 autoComplete="on"
                 className={`input-class ${isSubmitting ? "cursor-not-allowed opacity-50" : ""} border border-[var(--border)] text-[var(--foreground)] bg-transparent w-full h-full pt-6 pb-4 px-4 rounded-[15px] focus:outline-stone-500]`}
               />
-              {error.error && error.e === "email" && <p className="text-red-500">{error.message}</p>}
+              {error.error && error.e === "email" && <p>{error.message}</p>}
             </div>
 
             <div className="relative">
@@ -86,9 +86,9 @@ export default function Home() {
               <input
                 type={passwordShow ? "text" : "password"}
                 name="password"
-                disabled={isSubmitting}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
                 id="password"
                 autoComplete="off"
                 className={`input-class ${isSubmitting ? "cursor-not-allowed opacity-50" : ""} border border-[var(--border)] text-[var(--foreground)] bg-transparent w-full h-full pt-6 pb-4 px-4 rounded-[15px] focus:outline-stone-500`}
@@ -98,10 +98,10 @@ export default function Home() {
                 {passwordShow ? <Visibility /> : <VisibilityOff />}
               </button>
 
-              {error.error && error.e === "password" && <p className="text-red-500">{error.message}</p>}
+              {error.error && error.e === "password" && <p>{error.message}</p>}
             </div>
 
-            {error.error && error.e === "general" && <p className="text-red-500 text-start">{error.message}</p>}
+            {error.error && error.e === "general" && <p className="text-start">{error.message}</p>}
 
             <div>
               <button
