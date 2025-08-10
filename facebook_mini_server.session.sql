@@ -1,1 +1,0 @@
-SELECT * FROM public.users_profile_photos

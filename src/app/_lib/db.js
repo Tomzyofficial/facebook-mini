@@ -5,10 +5,7 @@ const isLocal = process.env.NODE_ENV === "development";
 // Create the pool
 const pool = new Pool({
   connectionString: process.env.POSTGRE_DATABASE_URL,
-  ssl:
-    process.env.POSTGRE_DATABASE_URL?.includes("localhost") || isLocal
-      ? false // no SSL for local dev
-      : { rejectUnauthorized: false }, // SSL for hosted DBs (Heroku, Railway, Supabase, Neon, etc.)
+  ssl: process.env.POSTGRE_DATABASE_URL?.includes("localhost") || isLocal ? { rejectUnauthorized: false } : { rejectUnauthorized: false },
 });
 
 pool.on("error", (error) => {

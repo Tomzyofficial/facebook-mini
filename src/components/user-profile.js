@@ -5,10 +5,6 @@ import AddsharpIcon from "@mui/icons-material/AddSharp";
 import SearchIcon from "@mui/icons-material/Search";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
 
 /*********** React Hooks ***********/
 import { useEffect, useState } from "react";
@@ -256,7 +252,8 @@ export function UserProfile() {
             <div className="relative w-full">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2" sx={{ color: "GrayText" }} />
               <form onSubmit={handleSearchFilter} aria-busy={isLoading}>
-                <input type="text" name="inputText" placeholder="Search with Meta AI" className="bg-neutral-200 p-2 pl-10 rounded-lg outline-none border-none w-full" />
+                <input type="text" name="inputText" placeholder="Search with Meta AI" className="bg-(--secondary-light) dark:bg-neutral-600 p-2 pl-10 rounded-lg outline-none border-none w-full" />
+                <button type="submit" className="hidden"></button>
               </form>
             </div>
           </div>
@@ -278,7 +275,7 @@ export function UserProfile() {
         </Modal>
         {/* End search modal here */}
 
-        <div className="flex items-center justify-between my-4 p-2 border-b-1 border-slate-100">
+        <div className="flex items-center justify-between my-4 p-2 border-b-1 border-slate-100 dark:border-neutral-900">
           <div className="flex items-center w-full">
             {/* This element is responsible for showing the user profile */}
             <span onClick={() => handleTabClick("profile")}>
@@ -316,10 +313,8 @@ export function UserProfile() {
                   name="postText"
                   value={formData.postText}
                   onChange={handlePostTextChange}
-                  // cols="80"
-                  // rows="5"
                   style={{ resize: "none" }}
-                  className="dark:placeholder-(--white-color) dark:text-(--white-color) mt-3 h-60 border-none outline-none w-full"
+                  className="dark:placeholder-(--secondary-light) dark:text-(--secondary-light) mt-3 h-60 border-none outline-none w-full"
                   placeholder="What do you want to talk about?"
                 ></textarea>
               </form>
@@ -373,7 +368,7 @@ export function UserProfile() {
       <section className="mb-30">
         <div>
           {retrievedPosts.map((item) => (
-            <div key={item.id} className="shadow-lg mt-1 p-5 bg-white border-t border-slate-100">
+            <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-zinc-900 dark:border-neutral-900 border-t border-slate-100">
               <div className="flex items-center justify-between">
                 <Image src="/images/avatar_man.jpg" width={30} height={30} className="rounded-full" alt="Profile avatar" />
                 <small>{new Date(item.created_at).getMinutes()}m</small>

@@ -131,6 +131,8 @@ export default function StepByStepSignup() {
 
             <div className="grid grid-cols-1 gap-4">
               <TextField
+                min="2007-01-01"
+                max="2025-01-01"
                 type="date"
                 name="dob"
                 value={formData.dob}
@@ -226,6 +228,7 @@ export default function StepByStepSignup() {
             <div className="grid grid-cols-1 gap-4">
               <div className="relative grid">
                 <TextField
+                  required
                   disabled={isSubmitting}
                   className={isSubmitting ? "cursor-not-allowed opacity-50" : ""}
                   type={passwordShow ? "text" : "password"}
