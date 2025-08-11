@@ -6,14 +6,14 @@ export async function GET(req) {
     const userId = searchParams.get("userId");
 
     if (!userId) {
-      return Response.json({ imageUrl: null, error: "User ID is required" }, { status: 400 });
+      return;
     }
 
     const user = await getUserProfileImage(userId);
 
-    if (!user || !user.current_profile_image) {
-      return Response.json({ imageUrl: null }, { status: 400 });
-    }
+    // if (!user || !user.current_profile_image) {
+    //   return Response.json({ imageUrl: null }, { status: 400 });
+    // }
 
     return Response.json({ imageUrl: user.current_profile_image }, { status: 200 });
   } catch (error) {

@@ -21,7 +21,7 @@ export async function GET() {
       {
         success: true,
         message: "Post retrieved successfully",
-        result: retrieved.rows, // this is an array
+        result: retrieved.rows,
       },
       { status: 200 }
     );
@@ -31,7 +31,7 @@ export async function GET() {
       {
         success: false,
         message: "Post not retrieved",
-        result: null, // this is an array
+        result: null,
       },
       { status: 400 }
     );

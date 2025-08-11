@@ -40,6 +40,8 @@ export function UserProfile() {
         const data = await res.json();
         if (res.ok && Array.isArray(data.result)) {
           setRetrievedPosts(data.result);
+        } else {
+          setRetrievedPosts(null);
         }
       } catch (err) {
         console.error("Error fetching posts", err);
@@ -367,17 +369,18 @@ export function UserProfile() {
 
       <section className="mb-30">
         <div>
-          {retrievedPosts.map((item) => (
-            <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
-              <div className="flex items-center justify-between">
-                <Image src="/images/avatar_man.jpg" width={30} height={30} className="rounded-full" alt="Profile avatar" />
-                <small>{new Date(item.created_at).getMinutes()}m</small>
+          {Array.isArray(retrievedPosts) &&
+            retrievedPosts.map((item) => (
+              <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <Image src="/images/avatar_man.jpg" width={30} height={30} className="rounded-full" alt="Profile avatar" />
+                  <small>{new Date(item.created_at).getMinutes()}m</small>
+                </div>
+                <div className="pt-10">
+                  <span>{item.post_text}</span>
+                </div>
               </div>
-              <div className="pt-10">
-                <span>{item.post_text}</span>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 

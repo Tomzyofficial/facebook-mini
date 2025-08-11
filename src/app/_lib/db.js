@@ -27,7 +27,7 @@ export async function updateUserImage(userId, imagePath) {
     const rowsResult = await pool.query("SELECT profile_pic FROM public.users_profile_photos WHERE user_acct = $1 ORDER BY id DESC LIMIT 1", [userId]);
     console.log(`Retrieved ${rowsResult.rows.length} profile images for user ${userId}`);
 
-    if (rowsResult.rows.length === 0) {
+    if (rowsResult.rows.length < 1) {
       throw new Error("Failed to retrieve inserted profile image");
     }
 

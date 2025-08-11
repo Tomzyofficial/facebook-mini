@@ -40,7 +40,6 @@ export async function POST(req) {
     if (insertResult.rows.length > 0) {
       const userId = insertResult.rows[0].id;
       await createSession(userId);
-      console.table(insertResult.rows[0]);
       return new Response(JSON.stringify({ success: true, message: "User created successfully" }), { status: 201 });
     } else {
       return new Response(JSON.stringify({ success: false, error: "Failed to create user" }), { status: 400 });
