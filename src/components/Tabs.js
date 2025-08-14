@@ -1,11 +1,14 @@
 "use client";
+/*************** MUI ******************/
 import { HomeRounded } from "@mui/icons-material";
 import OndemandVideoRoundedIcon from "@mui/icons-material/OndemandVideoRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+/*************** React Hooks ******************/
 import { useEffect, useState } from "react";
+/*************** Code Imports ******************/
 import { MenuTab } from "@/components/MenuTab";
 
 // Tabs component

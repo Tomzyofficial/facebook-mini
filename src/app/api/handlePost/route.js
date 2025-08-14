@@ -38,9 +38,9 @@ export async function POST(req) {
 
     if (!postText || postText.trim() == "") return NextResponse.json({ success: false, message: "post unsuccessful" }, { status: 400 });
 
-    const insertResult = await pool.query("INSERT INTO posts (post_text, user_acct) VALUES ($1, $2) RETURNING id", [postText, session.userId]);
+    const insertResult = await pool.query("INSERT INTO public.posts (post_text, user_acct) VALUES ($1, $2) RETURNING id", [postText, session.userId]);
 
-    const newPost = await pool.query("SELECT * FROM posts WHERE id = $1", [insertResult.rows[0].id]);
+    const newPost = await pool.query("SELECT p.post_text, p.created_at, u.fname, u.lname, u.current_profile_image FROM public.posts AS p JOIN public.users AS u ON p.user_acct = u.id WHERE p.id = $1", [insertResult.rows[0].id]);
 
     await pusher.trigger("posts-channel", "new-post", newPost.rows[0]);
 

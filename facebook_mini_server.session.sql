@@ -1,1 +1,3 @@
-SELECT * FROM public.users_profile_photos
+SELECT * FROM public.posts
+
+SELECT * FROM public.users

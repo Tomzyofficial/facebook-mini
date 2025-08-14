@@ -11,10 +11,10 @@ export async function GET() {
     return NextResponse.json({ authenticated: false, message: "No authorization" }, { status: 401 });
   }
 
-  const retrieved = await pool.query("SELECT * FROM public.posts ORDER BY id DESC LIMIT 10");
+  const retrieved = await pool.query("SELECT p.post_text, p.created_at, u.fname, u.lname, u.current_profile_image FROM public.posts AS p JOIN public.users AS u ON p.user_acct = u.id ORDER BY p.id DESC LIMIT 10");
 
   if (retrieved.rows.length > 0) {
-    console.log(`Post of user ${session.userId} successful and retrieved ${retrieved.rows.length} posts`);
+    console.log(`Post successfully retrieved, ${retrieved.rows.length} posts`);
 
     // Return an array of posts (even if only one), to match frontend expectations
     return NextResponse.json(

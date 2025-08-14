@@ -5,17 +5,16 @@ import AddsharpIcon from "@mui/icons-material/AddSharp";
 import SearchIcon from "@mui/icons-material/Search";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-
 /*********** React Hooks ***********/
 import { useEffect, useState } from "react";
-
+/*********** Code Imports ***********/
 import Image from "next/image";
 import Modal from "@/components/ui/Modal";
 import { Tab } from "@/components/Tabs";
 import { Profile } from "@/components/Profile";
 import styles from "@/app/styles/styles.module.css";
-
 import { ShowProfileImg } from "@/components/ShowProfileImg";
+import { OthersProfile } from "@/components/others-profile";
 
 export function UserProfile() {
   const [activeTab, setActiveTab] = useState("");
@@ -28,12 +27,12 @@ export function UserProfile() {
 
   const [retrievedPosts, setRetrievedPosts] = useState([]);
 
-  const [formData, setFormData] = useState({
+  const [postFormData, setPostFormData] = useState({
     postText: "",
   });
 
   useEffect(() => {
-    // Fetch the API endpoint to fetch initial posts
+    // Fetch getPosts API
     const fetchPosts = async () => {
       try {
         const res = await fetch("/api/getPosts");
@@ -41,10 +40,11 @@ export function UserProfile() {
         if (res.ok && Array.isArray(data.result)) {
           setRetrievedPosts(data.result);
         } else {
-          setRetrievedPosts(null);
+          setRetrievedPosts([]);
         }
       } catch (err) {
         console.error("Error fetching posts", err);
+        setRetrievedPosts([]);
       }
     };
     fetchPosts();
@@ -58,7 +58,11 @@ export function UserProfile() {
 
     const channel = pusher.subscribe("posts-channel");
     channel.bind("new-post", (data) => {
-      setRetrievedPosts((prev) => [data, ...prev]);
+      setRetrievedPosts((prev) => {
+        // Ensure prev is always an array
+        if (!Array.isArray(prev)) return [data];
+        return [data, ...prev];
+      });
     });
 
     // Clean up
@@ -70,7 +74,7 @@ export function UserProfile() {
 
   // Handle post change
   function handlePostTextChange(e) {
-    setFormData({ [e.target.name]: e.target.value });
+    setPostFormData({ [e.target.name]: e.target.value });
   }
 
   // Handle post submission
@@ -78,13 +82,12 @@ export function UserProfile() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Fetch handlepost POST from API. This component handles the post text submission
-
+    // Fetch handlepost POST API. This component handles the post text submission
     try {
       const response = await fetch("/api/handlePost", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(postFormData),
       });
 
       const data = await response.json();
@@ -92,12 +95,12 @@ export function UserProfile() {
       if (response.ok && data.success) {
         setIsSubmitting(true);
         setIsModalOpen(false);
-        setFormData("");
+        setPostFormData({ postText: "" });
       } else {
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.log(error);
+      console.log("Error inserting post", error);
     }
   };
 
@@ -105,12 +108,7 @@ export function UserProfile() {
     // Fetch Logged In user from the database
     async function fetchLoggedInUser() {
       try {
-        const res = await fetch("/api/fetchLoggedInUser", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch("/api/fetchLoggedInUser");
 
         const data = await res.json();
         if (data.user) {
@@ -125,12 +123,7 @@ export function UserProfile() {
     // Fetch other users
     async function fetchOtherUsers() {
       try {
-        const res = await fetch("/api/fetchOtherUsers", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch("/api/fetchOtherUsers");
 
         const data = await res.json();
         if (data.others) {
@@ -166,6 +159,7 @@ export function UserProfile() {
 
   // Handle tab click
   function handleTabClick(tab) {
+    console.log("tab clicked", tab);
     setActiveTab(tab);
     window.location.hash = tab;
   }
@@ -181,6 +175,8 @@ export function UserProfile() {
             }}
           />
         );
+      case "others-profile":
+        return <OthersProfile />;
     }
   }
 
@@ -193,9 +189,9 @@ export function UserProfile() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Get the value from the input field
-    const formData = new FormData(e.target);
-    const inputText = formData.get("inputText");
+    // Get the key-value pair from the search input field
+    const searchFormData = new FormData(e.target);
+    const inputText = searchFormData.get("inputText");
 
     try {
       const res = await fetch("/api/searchUserFilter", {
@@ -234,7 +230,7 @@ export function UserProfile() {
         <nav className="flex justify-between items-center p-2">
           <div className="logo">
             <h2 href="/" className="text-[var(--secondary)] font-bold text-2xl">
-              facebook
+              CodeRoots
             </h2>
           </div>
 
@@ -259,13 +255,13 @@ export function UserProfile() {
               </form>
             </div>
           </div>
-          <div>
+          <div className="py-4">
             {errorMessage ? (
               <p>{errorMessage}</p>
-            ) : resultRows.length > 0 ? (
+            ) : resultRows.length ? (
               <ul>
                 {resultRows.map((row, idx) => (
-                  <li key={idx}>
+                  <li key={idx} className="cursor-pointer" onClick={() => handleTabClick("others-profile")}>
                     {row.fname ? row.fname.charAt(0).toUpperCase() + row.fname.slice(1) : ""} {row.lname ? row.lname.charAt(0).toUpperCase() + row.lname.slice(1) : ""}
                   </li>
                 ))}
@@ -285,7 +281,7 @@ export function UserProfile() {
             </span>
 
             {/* This element is responsible for displaying the post post modal section  */}
-            <input type="text" name="name" autoComplete="off" onClick={() => setIsModalOpen(true)} placeholder="What's on your mind?" className="w-full py-4 px-2 outline-none" />
+            <input type="text" name="" autoComplete="off" onClick={() => setIsModalOpen(true)} placeholder="What's on your mind?" className="w-full py-4 px-2 outline-none" />
           </div>
           <span>
             <PanoramaIcon sx={{ fontSize: "30px" }} />
@@ -298,7 +294,7 @@ export function UserProfile() {
                 <div className={styles.modalTop}>
                   <button onClick={() => setIsModalOpen(false)}>X</button>
                   <p>Create post</p>
-                  <button type="submit" className={`${formData.postText == "" ? "disabled opacity-50" : ""} cursor-pointer`} onSubmit={handlePostSubmit}>
+                  <button type="submit" className={`${postFormData.postText === "" ? "disabled opacity-50" : ""} cursor-pointer`} onSubmit={handlePostSubmit}>
                     Post
                   </button>
                 </div>
@@ -313,7 +309,7 @@ export function UserProfile() {
 
                 <textarea
                   name="postText"
-                  value={formData.postText}
+                  value={postFormData.postText}
                   onChange={handlePostTextChange}
                   style={{ resize: "none" }}
                   className="dark:placeholder-(--secondary-light) dark:text-(--secondary-light) mt-3 h-60 border-none outline-none w-full"
@@ -367,17 +363,40 @@ export function UserProfile() {
         </div>
       </section>
 
-      <section className="mb-30">
+      {/* Display posts  */}
+      <section className="mb-30 mt-10">
         <div>
           {Array.isArray(retrievedPosts) &&
-            retrievedPosts.map((item) => (
-              <div key={item.id} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
+            retrievedPosts.map((post, idx) => (
+              <div key={idx} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
                 <div className="flex items-center justify-between">
-                  <Image src="/images/avatar_man.jpg" width={30} height={30} className="rounded-full" alt="Profile avatar" />
-                  <small>{new Date(item.created_at).getMinutes()}m</small>
+                  <div className="flex gap-2">
+                    <Image src={post.current_profile_image} width={25} height={25} className="rounded-full h-[33px] w-[33px]" alt="Profile avatar" />
+                    {post ? (
+                      <span>
+                        {post.fname} {post.lname}{" "}
+                      </span>
+                    ) : (
+                      <span>no name</span>
+                    )}
+                  </div>
+                  <small>
+                    {(() => {
+                      const now = new Date();
+                      const created = new Date(post.created_at);
+                      const diffMs = now - created;
+                      const diffMins = Math.floor(diffMs / (1000 * 60));
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      if (diffMins < 1) return "Just now";
+                      if (diffMins < 60) return `${diffMins}m`;
+                      if (diffHours < 24) return `${diffHours}h`;
+                      return `${diffDays}d`;
+                    })()}
+                  </small>
                 </div>
                 <div className="pt-10">
-                  <span>{item.post_text}</span>
+                  <span>{post.post_text}</span>
                 </div>
               </div>
             ))}
@@ -385,7 +404,7 @@ export function UserProfile() {
       </section>
 
       {handleSwitchTab()}
-      {/* Call the Tab function to render active tab section */}
+      {/* Render footer Tab function */}
       <Tab />
     </>
   );

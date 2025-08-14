@@ -19,17 +19,18 @@ export async function POST(req) {
       return NextResponse.json({ status: 400, res: "Missing search query", success: false }, { status: 400 });
     }
 
+    // Query the users table for users whose first or last name matches the inputText, excluding the current user
     const queryResult = await pool.query(
-      `SELECT * FROM users 
+      `SELECT * FROM public.users 
        WHERE id != $1 AND (
-         fname LIKE $2 OR
-         lname LIKE $3
+         fname ILIKE $2 OR
+         lname ILIKE $2
        )`,
-      [session.userId, `%${inputText}%`, `%${inputText}%`]
+      [session.userId, `%${inputText}%`]
     );
-    const result = queryResult.rows;
 
-    return NextResponse.json({ status: 200, res: result, success: true }, { status: 200 });
+    // Return the rows as the result
+    return NextResponse.json({ status: 200, res: queryResult.rows, success: true }, { status: 200 });
   } catch (error) {
     console.error("Error searching users:", error);
     return NextResponse.json({ status: 500, res: "Internal server error" }, { status: 500 });

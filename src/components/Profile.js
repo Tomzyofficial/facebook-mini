@@ -1,4 +1,5 @@
 "use client";
+/*************** MUI ***************/
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddsharpIcon from "@mui/icons-material/AddSharp";
@@ -6,13 +7,13 @@ import CreateIcon from "@mui/icons-material/Create";
 import SearchIcon from "@mui/icons-material/Search";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import PersonIcon from "@mui/icons-material/Person";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+/*************** Code Imports ***************/
 import { verifySession } from "@/app/_lib/session";
+import Image from "next/image";
+/*************** React Hooks ***************/
+import { useEffect, useRef, useState } from "react";
 
 export function Profile({ onImageUpdate }) {
-  const router = useRouter();
   const inputRef = useRef(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -144,11 +145,17 @@ export function Profile({ onImageUpdate }) {
   };
 
   return (
-    <main className="top-0 left-0 fixed overflow-y-auto h-[87vh] w-full bg-[var(--background)]">
+    <main className="top-0 left-0 fixed overflow-y-auto h-full w-full bg-[var(--background)]">
       <section className="pb-14">
         <div className="relative bg-[url(/images/profile-img.webp)] bg-cover object-center bg-center bg-no-repeat min-h-40 rounded-t rounded-t-10 text-white">
           <div className="flex justify-between items-center pt-4">
-            <span onClick={() => router.back()}>
+            <span
+            /*   onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.history.back();
+                }
+              }} */
+            >
               <ChevronLeftIcon sx={{ fontSize: "30px" }} />
             </span>
             <span className="flex gap-2">
