@@ -6,7 +6,6 @@ export async function signout() {
     const destroySession = await deleteSession();
 
     if (destroySession) {
-      // On sign out, delete session cookie and return to sign in page
       redirect("/");
     }
   } catch (error) {

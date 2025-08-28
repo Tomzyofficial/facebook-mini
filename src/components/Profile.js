@@ -10,7 +10,7 @@ import PersonIcon from "@mui/icons-material/Person";
 /*************** Code Imports ***************/
 import { verifySession } from "@/app/_lib/session";
 import Image from "next/image";
-/*************** React Hooks ***************/
+/*************** React ***************/
 import { useEffect, useRef, useState } from "react";
 
 export function Profile({ onImageUpdate }) {
@@ -24,7 +24,7 @@ export function Profile({ onImageUpdate }) {
 
   // Get profile image from the database on component mount
   useEffect(() => {
-    async function getProfileImage() {
+    async function GetProfileImage() {
       try {
         setIsLoading(true);
         const session = await verifySession();
@@ -48,17 +48,12 @@ export function Profile({ onImageUpdate }) {
       }
     }
 
-    getProfileImage();
+    GetProfileImage();
 
     // Fetch logged in user and return the data
-    async function fetchLoggedInUser() {
+    async function FetchLoggedInUser() {
       try {
-        const res = await fetch("/api/fetchLoggedInUser", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch("/api/fetchLoggedInUser");
 
         const data = await res.json();
         if (data.user) {
@@ -68,7 +63,7 @@ export function Profile({ onImageUpdate }) {
         console.error("Failed to fetch logged in user:", err);
       }
     }
-    fetchLoggedInUser();
+    FetchLoggedInUser();
   }, []);
 
   // Profile image upload handler
@@ -145,41 +140,33 @@ export function Profile({ onImageUpdate }) {
   };
 
   return (
-    <main className="top-0 left-0 fixed overflow-y-auto h-full w-full bg-[var(--background)]">
-      <section className="pb-14">
-        <div className="relative bg-[url(/images/profile-img.webp)] bg-cover object-center bg-center bg-no-repeat min-h-40 rounded-t rounded-t-10 text-white">
-          <div className="flex justify-between items-center pt-4">
-            <span
-            /*   onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.history.back();
-                }
-              }} */
-            >
-              <ChevronLeftIcon sx={{ fontSize: "30px" }} />
-            </span>
-            <span className="flex gap-2">
-              <CreateIcon sx={{ fontSize: "30px" }} />
-              <SearchIcon sx={{ fontSize: "30px" }} />
-            </span>
-          </div>
+    <section className="top-0 left-0 fixed overflow-y-auto h-full w-full bg-[var(--background)]">
+      <section className="mb-14 relative bg-[#003049] min-h-40 rounded-t rounded-t-10 text-(--white-color)">
+        <div className="flex justify-between items-center pt-4">
+          <span>
+            <ChevronLeftIcon sx={{ fontSize: "30px" }} />
+          </span>
+          <span className="flex gap-2">
+            <CreateIcon sx={{ fontSize: "30px" }} />
+            <SearchIcon sx={{ fontSize: "30px" }} />
+          </span>
+        </div>
 
-          <div className="flex justify-between translate-y-12 items-center text-white px-2">
-            <span onClick={handleAvatarClick} className={`flex justify-center items-center relative bg-[rgb(0.8,0.8,0.8)] w-26 h-26 rounded-full cursor-pointer ${isUploading ? "opacity-50" : ""}`} id="imageParent">
-              {imageSrc ? <Image src={imageSrc} alt="User Profile image" width={100} height={100} className="rounded-full h-26 w-26" /> : <PersonIcon sx={{ fontSize: "100px" }} />}
+        <div className="flex justify-between translate-y-12 items-center text-(--white-color) px-2">
+          <span onClick={handleAvatarClick} className={`flex justify-center items-center relative bg-[rgb(0.8,0.8,0.8)] w-26 h-26 rounded-full cursor-pointer ${isUploading ? "opacity-50" : ""}`} id="imageParent">
+            {imageSrc ? <Image src={imageSrc} alt="User Profile image" width={100} height={100} className="rounded-full h-26 w-26" /> : <PersonIcon sx={{ fontSize: "100px" }} />}
 
-              {isUploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                  <div className="text-white text-sm">Uploading...</div>
-                </div>
-              )}
-            </span>
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                <div className="text-(--white-color) text-sm">Uploading...</div>
+              </div>
+            )}
+          </span>
 
-            <input type="file" accept="image/*" name="image" autoComplete="off" className="hidden" ref={inputRef} onChange={handleFileChange} />
-            <span>
-              <PanoramaIcon />
-            </span>
-          </div>
+          <input type="file" accept="image/*" name="image" className="hidden" ref={inputRef} onChange={handleFileChange} />
+          <span>
+            <PanoramaIcon />
+          </span>
         </div>
       </section>
 
@@ -190,7 +177,8 @@ export function Profile({ onImageUpdate }) {
             <ExpandMoreIcon />
           </span>
         </div>
-        <div className="flex justify-between text-white gap-2 font-bold my-4">
+
+        <div className="flex justify-between text-(--white-color) gap-2 font-bold my-4">
           <button className="bg-[var(--secondary-dim)] flex-1 p-2 rounded-lg ">
             <span>
               <AddsharpIcon />
@@ -206,6 +194,6 @@ export function Profile({ onImageUpdate }) {
           <button className="bg-[var(--foreground)] flex-0  py-2 px-4 rounded-lg">...</button>
         </div>
       </section>
-    </main>
+    </section>
   );
 }

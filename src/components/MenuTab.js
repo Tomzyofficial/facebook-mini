@@ -1,4 +1,5 @@
 "use client";
+/***************** MUI ****************/
 import SettingsSharp from "@mui/icons-material/SettingsSharp";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMore";
@@ -11,6 +12,7 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import DirectionsBoatFilledRoundedIcon from "@mui/icons-material/DirectionsBoatFilledRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+/***************** React ****************/
 import { signout } from "@/app/api/auth/signout/route";
 import { ShowProfileImg } from "@/components/ShowProfileImg";
 import { useEffect, useState } from "react";
@@ -52,7 +54,7 @@ export function MenuTab() {
   }, []);
 
   return (
-    <div className="top-0 left-0 fixed overflow-y-auto pb-4 h-[87vh] w-full bg-[var(--background)] text-[var(--foreground)]">
+    <div className="top-0 left-0 fixed overflow-y-auto pb-10 h-[90%] w-full bg-[var(--background)] text-[var(--foreground)]">
       <div className="m-3">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-bold">Menu</h1>

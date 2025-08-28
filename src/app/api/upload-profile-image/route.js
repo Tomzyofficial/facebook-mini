@@ -23,10 +23,13 @@ export async function POST(req) {
       return new Response("File size must be less than 5MB", { status: 400 });
     }
 
+    // arrayBuffer is a generic fixed-length binary container
     const bytes = await file.arrayBuffer();
+    // Buffer is a special type of object in Node.js used to store binary data directly (like images, files) in memory
+    // Buffer deal with binary streams from files, network sockets etc.
     const buffer = Buffer.from(bytes);
 
-    // Wrap upload_stream in a Promise so we can use await
+    // Wrap upload_stream in a Promise so it can use await
     const uploaded = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream({ folder: "profileUploads" }, (error, result) => {
         if (error) return reject(error);

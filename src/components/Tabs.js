@@ -7,9 +7,8 @@ import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 /*************** React Hooks ******************/
-import { useEffect, useState } from "react";
+import { useState } from "react";
 /*************** Code Imports ******************/
-import { MenuTab } from "@/components/MenuTab";
 
 // Tabs component
 // This component is used to display the footer tabs of the user profile page
@@ -36,26 +35,6 @@ export function Tab() {
     window.location.hash = tab;
   };
 
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (hash) setActiveTab(hash);
-    };
-    handleHashChange();
-
-    window.addEventListener("hashchange", handleHashChange);
-
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-
-  // Switch to determine active tab
-  function handleSwitchTab() {
-    switch (activeTab) {
-      case "menu":
-        return <MenuTab />;
-    }
-  }
-
   return (
     <>
       <main className="fixed bottom-0 left-0 right-0 bg-[var(--background)] border-t border-[var(--border)] py-4 px-2 md:px-4 text-xs">
@@ -68,9 +47,6 @@ export function Tab() {
           ))}
         </div>
       </main>
-
-      {/* Call the handleSwitchTab function above and show the active tab */}
-      {handleSwitchTab()}
     </>
   );
 }

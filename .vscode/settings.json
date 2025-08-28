@@ -11,8 +11,12 @@
       "previewLimit": 50,
       "server": "localhost",
       "driver": "PostgreSQL",
-      "name": "facebook_mini_server",
-      "connectString": "postgresql://facebook_mini:JB8hqPZYUTyliN7UnevrRNqEQhrrGiXB@dpg-d2035eq4d50c73b8p00g-a.oregon-postgres.render.com/facebook_mini"
+      "name": "facebook",
+      "connectString": "postgresql://facebook:NktX0wuxlYeLbhmoZrGFpxitKZ8VTeSp@dpg-d2kcta2li9vc73e7aaa0-a.oregon-postgres.render.com/facebook_cv9x"
     }
-  ]
+  ],
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "notebook.defaultFormatter": "esbenp.prettier-vscode"
 }

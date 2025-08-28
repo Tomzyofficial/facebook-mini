@@ -4,19 +4,10 @@ import { NextResponse } from "next/server";
 
 import pool from "@/app/_lib/db";
 import { verifySession } from "@/app/_lib/session";
-
-import Pusher from "pusher";
-
-// Pusher connection
-const pusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID,
-  key: process.env.PUSHER_KEY,
-  secret: process.env.PUSHER_SECRET,
-  cluster: process.env.PUSHER_CLUSTER,
-  useTLS: true,
-});
+import { PusherServer } from "@/app/api/pusher-config";
 
 export async function POST(req) {
+  const pusher = PusherServer();
   const session = await verifySession();
 
   // If no user session, return new response with a 401 status
@@ -42,6 +33,7 @@ export async function POST(req) {
 
     const newPost = await pool.query("SELECT p.post_text, p.created_at, u.fname, u.lname, u.current_profile_image FROM public.posts AS p JOIN public.users AS u ON p.user_acct = u.id WHERE p.id = $1", [insertResult.rows[0].id]);
 
+    // Await for pusher to trigger
     await pusher.trigger("posts-channel", "new-post", newPost.rows[0]);
 
     return NextResponse.json({ success: true, message: "Post successful", result: newPost.rows[0] }, { status: 200 });

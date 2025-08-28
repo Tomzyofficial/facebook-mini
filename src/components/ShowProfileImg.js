@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { verifySession } from "@/app/_lib/session";
 import Image from "next/image";
 
-export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, className, refreshTrigger }) {
+export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, className, refreshtrigger }) {
   const [imageSrc, setImageSrc] = useState(null);
   const [userId, setUserId] = useState(null);
   const [hasCustomImage, setHasCustomImage] = useState(false);
@@ -50,7 +50,7 @@ export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, clas
 
   useEffect(() => {
     fetchUserProfileImage();
-  }, [fetchUserProfileImage, refreshTrigger]);
+  }, [fetchUserProfileImage, refreshtrigger]);
 
   // Show loading state
   if (isLoading) {
@@ -64,7 +64,7 @@ export function ShowProfileImg({ fallbackImage, fallbackAlt, width, height, clas
 
   // Return fallback image if provided
   if (fallbackImage) {
-    return <Image loading="lazy" src={fallbackImage} alt={fallbackAlt || "User avatar"} width={width} height={height} className={className} />;
+    return <Image loading="lazy" src={fallbackImage} alt={fallbackAlt || "User avatar"} width={width} height={height} className={className} refreshtrigger={refreshtrigger} />;
   }
 
   // Return a placeholder if no fallback is provided

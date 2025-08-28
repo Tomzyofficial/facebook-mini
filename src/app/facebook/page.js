@@ -1,5 +1,5 @@
 "use server";
-import { UserProfile } from "@/components/user-profile";
+import { UserProfile } from "@/components/User-profile";
 import { verifySession } from "@/app/_lib/session";
 
 import { redirect } from "next/navigation";

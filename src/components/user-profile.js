@@ -1,11 +1,11 @@
 "use client";
-import Pusher from "pusher-js";
+import { PusherClient } from "@/app/api/pusher-config";
 /*********** Mui material components ************/
 import AddsharpIcon from "@mui/icons-material/AddSharp";
 import SearchIcon from "@mui/icons-material/Search";
 import PanoramaIcon from "@mui/icons-material/Panorama";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-/*********** React Hooks ***********/
+/*********** React ***********/
 import { useEffect, useState } from "react";
 /*********** Code Imports ***********/
 import Image from "next/image";
@@ -14,11 +14,15 @@ import { Tab } from "@/components/Tabs";
 import { Profile } from "@/components/Profile";
 import styles from "@/app/styles/styles.module.css";
 import { ShowProfileImg } from "@/components/ShowProfileImg";
-import { OthersProfile } from "@/components/others-profile";
+import { OthersProfile } from "@/components/Others-profile";
+import { MenuTab } from "@/components/MenuTab";
+import { Notification } from "@/components/Notification";
+// import { SetLocalStorage } from "@/components/Utils";
 
 export function UserProfile() {
+  const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("");
-  const [loggedInUser, setLoggedInUser] = useState({});
+  const [loggedInUser, setLoggedInUser] = useState([]);
   const [otherUsers, setOtherUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSeachOpen, setIsSearchOpen] = useState(false);
@@ -32,7 +36,7 @@ export function UserProfile() {
   });
 
   useEffect(() => {
-    // Fetch getPosts API
+    // Fetch getPosts API. This component retrieves the posts rows from the table
     const fetchPosts = async () => {
       try {
         const res = await fetch("/api/getPosts");
@@ -50,11 +54,10 @@ export function UserProfile() {
     fetchPosts();
   }, []);
 
+  // On component mount, render
   useEffect(() => {
     // Use pusher to return newer posts
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-    });
+    const pusher = PusherClient();
 
     const channel = pusher.subscribe("posts-channel");
     channel.bind("new-post", (data) => {
@@ -72,7 +75,7 @@ export function UserProfile() {
     };
   }, []);
 
-  // Handle post change
+  // Handle post input change.
   function handlePostTextChange(e) {
     setPostFormData({ [e.target.name]: e.target.value });
   }
@@ -93,14 +96,13 @@ export function UserProfile() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setIsSubmitting(true);
         setIsModalOpen(false);
         setPostFormData({ postText: "" });
-      } else {
-        setIsSubmitting(false);
       }
     } catch (error) {
       console.log("Error inserting post", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,6 +117,7 @@ export function UserProfile() {
           setLoggedInUser(data.user);
         }
       } catch (err) {
+        setLoggedInUser([]);
         console.error("Failed to fetch logged in user:", err);
       }
     }
@@ -127,19 +130,18 @@ export function UserProfile() {
 
         const data = await res.json();
         if (data.others) {
-          // Assign the data results to the otherUsers state
           setOtherUsers(data.others);
-          console.log("Fetched other users:", data.others);
         } else {
-          console.error("No other users found");
+          setOtherUsers([]);
         }
       } catch (err) {
+        setOtherUsers([]);
         console.error("Failed to fetch users:", err);
       }
     }
     fetchOtherUsers();
 
-    // Reload the hash on mount and when it changes and preserve active tab url
+    // Replace the hash (#) with an empry string and preserve active tab url
     const handleHashChange = () => {
       const hash = window.location.hash.replace("#", "");
       if (hash) setActiveTab(hash);
@@ -157,26 +159,66 @@ export function UserProfile() {
     };
   }, []);
 
+  //  Modal close on URL change logic
+  useEffect(() => {
+    // Handler to close modals on url change (popstate covers browser navigation, hashchange covers hash, pushState/replaceState are patched)
+    const closeModals = () => {
+      setIsModalOpen(false);
+      setIsSearchOpen(false);
+    };
+
+    // Listen for popstate (back/forward navigation)
+    window.addEventListener("popstate", closeModals);
+    // Listen for hashchange (hash navigation)
+    window.addEventListener("hashchange", closeModals);
+
+    // Patch pushState and replaceState to also close modals
+    const origPushState = window.history.pushState;
+    const origReplaceState = window.history.replaceState;
+    window.history.pushState = function (...args) {
+      closeModals();
+      return origPushState.apply(this, args);
+    };
+
+    window.history.replaceState = function (...args) {
+      closeModals();
+      return origReplaceState.apply(this, args);
+    };
+
+    return () => {
+      window.removeEventListener("popstate", closeModals);
+      window.removeEventListener("hashchange", closeModals);
+      window.history.pushState = origPushState;
+      window.history.replaceState = origReplaceState;
+    };
+  }, []);
+  // End Modal close on URL change logic
+
   // Handle tab click
   function handleTabClick(tab) {
-    console.log("tab clicked", tab);
     setActiveTab(tab);
     window.location.hash = tab;
   }
 
+  // This component checks for tab switch and renders the appropriate page
   function handleSwitchTab() {
     switch (activeTab) {
       case "profile":
         return (
           <Profile
-            onImageUpdate={(imageUrl) => {
+            onImageUpdate={() => {
               // Trigger refresh of all ShowProfileImg components
               setRefreshTrigger((prev) => prev + 1);
             }}
           />
         );
       case "others-profile":
-        return <OthersProfile />;
+        return selectedUser && <OthersProfile user={selectedUser} />;
+      case "notification":
+        return <Notification />;
+
+      case "menu":
+        return <MenuTab />;
     }
   }
 
@@ -258,16 +300,26 @@ export function UserProfile() {
           <div className="py-4">
             {errorMessage ? (
               <p>{errorMessage}</p>
-            ) : resultRows.length ? (
-              <ul>
-                {resultRows.map((row, idx) => (
-                  <li key={idx} className="cursor-pointer" onClick={() => handleTabClick("others-profile")}>
-                    {row.fname ? row.fname.charAt(0).toUpperCase() + row.fname.slice(1) : ""} {row.lname ? row.lname.charAt(0).toUpperCase() + row.lname.slice(1) : ""}
-                  </li>
-                ))}
-              </ul>
             ) : (
-              ""
+              resultRows.length > 0 && (
+                <ul>
+                  {resultRows.map((user, idx) => (
+                    <li
+                      key={idx}
+                      className="cursor-pointer pt-1"
+                      onClick={() => {
+                        // Set the selected state and localstorage to the specific user id being clicked and handle the tab click
+                        setSelectedUser(user);
+                        // SetLocalStorage("user-searched", user.id);
+                        handleTabClick("others-profile");
+                        setIsSearchOpen(false);
+                      }}
+                    >
+                      {user.fname ? user.fname.charAt(0).toUpperCase() + user.fname.slice(1) : ""} {user.lname ? user.lname.charAt(0).toUpperCase() + user.lname.slice(1) : ""}
+                    </li>
+                  ))}
+                </ul>
+              )
             )}
           </div>
         </Modal>
@@ -277,11 +329,13 @@ export function UserProfile() {
           <div className="flex items-center w-full">
             {/* This element is responsible for showing the user profile */}
             <span onClick={() => handleTabClick("profile")}>
-              <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt="Profile Image Avatar" width={25} height={25} className="rounded-full h-[33px] w-[33px]" refreshTrigger={refreshTrigger} />
+              <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt="Profile Image Avatar" width={25} height={25} className="rounded-full h-[33px] w-[33px]" refreshtrigger={refreshTrigger} />
             </span>
 
-            {/* This element is responsible for displaying the post post modal section  */}
-            <input type="text" name="" autoComplete="off" onClick={() => setIsModalOpen(true)} placeholder="What's on your mind?" className="w-full py-4 px-2 outline-none" />
+            {/* This element is responsible for displaying the post modal section  */}
+            <span onClick={() => setIsModalOpen(true)} className="w-full py-4 px-2 outline-none">
+              What's on your mind?
+            </span>
           </div>
           <span>
             <PanoramaIcon sx={{ fontSize: "30px" }} />
@@ -301,7 +355,7 @@ export function UserProfile() {
 
                 <figure className="flex items-center gap-4 py-4">
                   {/* If user had selected a profile image, show it else show the user icon  */}
-                  <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt="Profile Image Avatar" width={25} height={25} className="rounded-full h-[33px] w-[33px]" refreshTrigger={refreshTrigger} />
+                  <ShowProfileImg fallbackImage={`/images/user_icon.svg`} fallbackAlt="Profile Image Avatar" width={25} height={25} className="rounded-full h-[33px] w-[33px]" refreshtrigger={refreshTrigger} />
                   <figcaption>
                     {loggedInUser.fname ? loggedInUser.fname.charAt(0).toUpperCase() + loggedInUser.fname.slice(1) : ""} {loggedInUser.lname ? loggedInUser.lname.charAt(0).toUpperCase() + loggedInUser.lname.slice(1) : ""}
                   </figcaption>
@@ -312,7 +366,7 @@ export function UserProfile() {
                   value={postFormData.postText}
                   onChange={handlePostTextChange}
                   style={{ resize: "none" }}
-                  className="dark:placeholder-(--secondary-light) dark:text-(--secondary-light) mt-3 h-60 border-none outline-none w-full"
+                  className="dark:placeholder-(--secondary-light) dark:text-(--secondary-light) pt-3 h-60 border-none outline-none w-full"
                   placeholder="What do you want to talk about?"
                 ></textarea>
               </form>
@@ -329,11 +383,11 @@ export function UserProfile() {
               {/* If user had already selected a profile image before, load the image from the database else use gender prop to determine whether user is a male or female -- show avatar icon respectfully */}
               <ShowProfileImg
                 fallbackImage={`/images/avatar_${loggedInUser.gender === "Male" ? "man" : "woman"}.jpg`}
-                fallbackAlt={`${loggedInUser.gender} Avatar`}
+                fallbackAlt={`${loggedInUser.gender ? loggedInUser.gender : "Profile"} Avatar`}
                 width={100}
                 height={100}
                 className="rounded-t-md h-25"
-                refreshTrigger={refreshTrigger}
+                refreshtrigger={refreshTrigger}
               />
               <figcaption className="text-sm flex flex-col items-center">
                 <span className="absolute bottom-9">
@@ -371,13 +425,15 @@ export function UserProfile() {
               <div key={idx} className="shadow-sm mt-1 p-5 bg-(--white-color) dark:bg-neutral-900 dark:border-neutral-900 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
-                    <Image src={post.current_profile_image} width={25} height={25} className="rounded-full h-[33px] w-[33px]" alt="Profile avatar" />
-                    {post ? (
+                    {post.current_profile_image ? (
+                      <Image loading="lazy" src={post.current_profile_image} alt=" Profile Image" width={25} height={25} className="rounded-full h-[30px] w-[30px]" />
+                    ) : (
+                      <Image loading="lazy" alt="Profile Image" src="/images/user_icon.svg" width={25} height={25} className="h-[33px] w-[33px]" />
+                    )}
+                    {post && (
                       <span>
                         {post.fname} {post.lname}{" "}
                       </span>
-                    ) : (
-                      <span>no name</span>
                     )}
                   </div>
                   <small>

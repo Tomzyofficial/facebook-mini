@@ -8,10 +8,10 @@ const pool = new Pool({
   ssl: process.env.POSTGRE_DATABASE_URL?.includes("localhost") || isLocal ? { rejectUnauthorized: false } : { rejectUnauthorized: false },
 });
 
-pool.on("error", (error) => {
-  console.error("Unexpected error occurred: ", error);
-  process.exit(1);
-});
+// pool.on("error", (error) => {
+//   console.error("Unexpected error occurred: ", error);
+//   process.exit(1);
+// });
 
 export default pool;
 
