@@ -163,11 +163,6 @@ export async function PUT(req) {
   );
 
   if (rows.length > 0) {
-    // await pusher.trigger(`user-${from_user_id}`, "request-declined", {
-    //   from_user_id: Number(from_user_id),
-    //   to_user_id: session.userId,
-    // });
-
     return NextResponse.json({ success: true, message: "Friend request declined" }, { status: 200 });
   } else {
     return NextResponse.json({ success: false, message: "No pending request found to decline" }, { status: 404 });

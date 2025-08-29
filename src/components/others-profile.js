@@ -16,7 +16,10 @@ export function OthersProfile({ user }) {
   const [requestSent, setRequestSent] = useState(false);
   const [requestLoading, setRequestLoading] = useState(false);
 
-  // On mount, check if request has been sent before and retain button state
+  const [requestAccepted, setRequestAccepted] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  // On mount, check if request has been sent before and retain button state -> change from "add friend" to "cancel request"
   useEffect(() => {
     if (user?.id) {
       const existingRequest = getLocalstorage(`request_${user.id}`);
@@ -26,7 +29,24 @@ export function OthersProfile({ user }) {
         setRequestSent(false);
       }
     }
-  }, [user]);
+  }, [user.id]);
+
+  // Fetch session from checkSession API. This is important to determine which users are friends with each other
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const res = await fetch("/api/checkSession");
+        const data = await res.json();
+        if (data.authenticated) {
+          setCurrentUserId(data.userId);
+        }
+      } catch (err) {
+        console.error("Failed to load session", err);
+        setCurrentUserId(null);
+      }
+    };
+    fetchSession();
+  }, []);
 
   // Handle sending friend request logic
   // The 'user' prop is used to send down data to the User-profile file.
@@ -50,7 +70,6 @@ export function OthersProfile({ user }) {
         // Using the localstorage enables the button 'Add friend' to have the "cancel request" when it is clicked
         SetLocalStorage(`request_${user.id}`, `friend request sent`);
         setRequestSent(true);
-        return new Response(JSON.stringify({ success: true, message: "Friend request sent" }), { status: 201 });
       } else {
         await fetch(`/api/friendRequest?to_user_id=${user.id}`, {
           method: "DELETE",
@@ -68,27 +87,27 @@ export function OthersProfile({ user }) {
     }
   };
 
-  // This component fetches the API endpoint that checks if friend request has been accepted
-  // const [requestAccepted, setRequestAccepted] = useState(false);
-  // useEffect(() => {
-  //   const selectAcceptedRow = async () => {
-  //     const res = await fetch(`/api/friendRequest?to_user_id=${user.id}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
+  // This component fetches the GET API endpoint that checks if friend request has been accepted and and change the element from "not friends" to "friends" and hide the "Add friend or Cancel request" button
+  useEffect(() => {
+    const selectAcceptedRow = async () => {
+      try {
+        const res = await fetch(`/api/checkFriendRequestStatus?from_user_id=${currentUserId}&to_user_id=${user.id}`);
+        if (!res.ok) {
+          setRequestAccepted(null);
+          return;
+        }
+        const data = await res.json();
 
-  //     const data = res.json();
-
-  //     if (!res.ok && !data.success) {
-  //       setRequestAccepted(false);
-  //       return;
-  //     }
-  //     setRequestAccepted(true);
-  //   };
-  //   selectAcceptedRow();
-  // }, []);
+        if (data.success) {
+          setRequestAccepted(data.result);
+        }
+      } catch (err) {
+        console.error("Error fetching friend requests: ", err);
+        setRequestAccepted(null);
+      }
+    };
+    selectAcceptedRow();
+  }, [currentUserId, user.id]);
 
   return (
     <section className="top-0 left-0 fixed overflow-y-auto h-full w-full bg-[var(--background)]">
@@ -119,10 +138,14 @@ export function OthersProfile({ user }) {
           <ExpandMoreIcon />
         </span>
         <div className="flex gap-2 font-bold my-4 text-(--white-color)">
-          <button className={`bg-[var(--secondary-dim)] flex-1 flex items-center justify-center p-2 rounded-lg cursor-pointer ${requestLoading ? "opacity-50 cursor-wait" : ""}`} onClick={handleFriendRequest} disabled={requestLoading}>
+          <button
+            className={`bg-[var(--secondary-dim)] flex-1 flex items-center justify-center p-2 rounded-lg cursor-pointer ${requestLoading && "opacity-50 cursor-wait"} ${requestAccepted === "ACCEPTED" && "hidden"}`}
+            onClick={handleFriendRequest}
+            disabled={requestLoading}
+          >
             <span>{requestSent ? "Cancel request" : "Add friend"}</span>
           </button>
-          <button className="bg-[var(--foreground)] flex-1 rounded-lg">Not friends</button>
+          <button className="bg-[var(--foreground)] flex-1 rounded-lg">{requestAccepted === "ACCEPTED" ? "Friends" : "Not friends"}</button>
           <button className="bg-[var(--foreground)] flex-0  py-2 px-4 rounded-lg">...</button>
         </div>
       </section>

@@ -20,6 +20,7 @@ export function Notification() {
         }
       } catch (err) {
         console.error("Failed to load session", err);
+        setCurrentUserId(null);
       }
     };
     fetchSession();
@@ -136,6 +137,7 @@ export function Notification() {
         return;
       }
 
+      setValidRequest((prev) => prev.filter((req) => req.from_user_id !== fromUserId));
       setRequestAccepted(data.result);
     } catch (err) {
       console.error("Error getting accepted friend requests: ", err);
